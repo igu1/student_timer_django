@@ -33,8 +33,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.2/css/drawer.min.css"></head>
     {% block extrahead %}{% endblock extrahead %}
     {% block extrastyle %}{% endblock extrastyle %}
-
-</head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" integrity="sha512-ZltC0pC5nP28uLJ2SBRo8EmFHA+giWPQC6nM4xzwW4hXsTaIsfSMn0qTtotOP8NNWlAohVlJtDfLRKXxA7mJ4A==" crossorigin="anonymous" referrerpolicy="no-referrer" /></head>
 
 <body class="g-sidenav-show bg-gray-100">
 
@@ -50,6 +49,7 @@
 
 {% endblock scripts %}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js" integrity="sha512-MCM74PPZwlAz3VdPGg3cQn4Jb83jO2Q3LGika//u7H+hyk0HfyraT0u0gVf4jB44xJj3WwbGxn45L7frballmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

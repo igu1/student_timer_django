@@ -213,7 +213,7 @@ def report(request):
 def leaderboard(request):
     users_readed = []
     today = datetime.now()
-    users = User.objects.all()
+    users = request.user.profile.friends.all()
     for user in users:
         today_timedelta = get_study_time_range(user, today, today + timedelta(days=1))
         today_hours = format_timedelta(today_timedelta)
@@ -245,6 +245,23 @@ def ask(request):
         context = {"data": data}
 
     return render(request, "pages/ask-questions.html", context)
+
+
+def friends(request):
+
+    return render(
+        request,
+        "pages/friends.html",
+        {"users": User.objects.all().exclude(id=request.user.id)},
+    )
+
+
+def add_friend(request, id):
+    if User.objects.get(id=id) not in request.user.profile.friends.all():
+        request.user.profile.friends.add(User.objects.get(id=id))
+    else:
+        request.user.profile.friends.remove(User.objects.get(id=id))
+    return redirect("friends")
 
 
 # AIzaSyAE-6xV3UHMTfi-nGj-VFYHElz3rB-fPos

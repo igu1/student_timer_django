@@ -147,7 +147,21 @@
     </div>
   </div>
   {% endblock content %} {% block scripts %}
-
+  <script>
+    introJs()
+      .setOptions({
+        steps: [
+          {
+            intro: "Hello world!",
+          },
+          {
+            element: document.querySelector("#login"),
+            intro: "Click here to login!",
+          },
+        ],
+      })
+      .start();
+  </script>
   <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
   <script>
         function purchase() {

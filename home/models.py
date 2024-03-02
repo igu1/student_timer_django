@@ -37,6 +37,7 @@ class Quote(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     premium_user = models.BooleanField(default=False)
+    friends = models.ManyToManyField(User, related_name="friends", blank=True)
     first_name = models.CharField(max_length=255)
     profile_pic = models.ImageField(upload_to="profile_pics", null=True, blank=True)
     score = models.IntegerField(default=0)

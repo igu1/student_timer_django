@@ -8,18 +8,28 @@
     <button class="btn" onclick="resetTimer()">Reset</button>
     <a href="{% url 'ask' %}" class="btn bg-success text-white" style="margin-bottom: 0px">Ask Me</a>
   </div>
-  <a
-    href="{% url 'report' %}"
-    style="font-size: 2.5rem; margin-top: 10%"
-    data-toggle="tooltip"
-    data-placement="top"
-    title="Show The Reports"
-  >
+  <a href="{% url 'report' %}" style="font-size: 2.5rem; margin-top: 10%" id="report-btn">
     <i class="fa fa-angle-down"></i>
   </a>
 </div>
 
 <style>
+  #report-btn {
+    animation: upanddown 1.5s infinite;
+  }
+
+  @keyframes upanddown {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
   .clock {
     display: flex;
     flex-direction: column;
@@ -28,6 +38,7 @@
     height: 80vh;
   }
   .clock .timer-circle {
+    font-family: "Montserrat", sans-serif;
     font-size: 10rem;
     font-weight: 200;
   }

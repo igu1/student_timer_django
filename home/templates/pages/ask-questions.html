@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid py-4" id="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        {% if not data %}
+        <form action="{% url 'ask' %}" method="post">
+          {% csrf_token %}
+          <p>Write Your Topics, We Will Take Care of the rest</p>
+          <textarea name="datas" id="" cols="30" rows="15"></textarea>
+          <button type="submit" onClick="loading()" class="btn btn-info mt-2 w-100">Make Me Questions</button>
+        </form>
+        {% else %}
+        <p>{{data|safe}}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function loading() {
+    let timerInterval;
+    Swal.fire({
+      title: "Fetching Your Questions...",
+      timer: 2000,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      willClose: () => {
+        clearInterval(timerInterval);
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log("I was closed by the timer");
+      }
+    });
+  }
+</script>
+{% endblock content %}

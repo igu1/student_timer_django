@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+      <div class="d-flex justify-content-center">{% include 'includes/leaderboard.html' %}</div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'js/countdown.js' %}"></script>
+{% endblock content %}

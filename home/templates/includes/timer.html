@@ -1,0 +1,203 @@
+{% load static %}
+  <div class="clock main">
+    <div class="text-center text-bold p-2 rounded">{{quote}}</div>
+    <div class="timer-circle" id="timer">00:00:00</div>
+    <div class="song-name text-center text-success" id="song"></div>
+    <div class="control-buttons">
+      <button class="btn" onclick="resetTimer()" style="z-index: 10">Reset Time</button>
+      <button onclick="handleClose()" style="margin-bottom: 0px; z-index: 10" class="btn">Back</button>
+      <div class="dropdown mt-4" style="margin-bottom: 20px">
+        <button
+          class="btn btn-success dropdown-toggle"
+          type="button"
+          id="musicDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          style="z-index: 10"
+        >
+          Select Music
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="musicDropdown">
+          <li><a class="dropdown-item" href="#" onclick="stopMusic()">Stop</a></li>
+          <li><a class="dropdown-item" href="#" onclick="playMusic('perfect-beauty.mp3')">Perfect Beauty</a></li>
+          <li><a class="dropdown-item" href="#" onclick="playMusic('midnight-forest.mp3')">Midnight Forest</a></li>
+          <li>
+            <a class="dropdown-item" href="#" onclick="playMusic('relax-in-the-forest.mp3')">Relax In The Forest</a>
+          </li>
+              <li><button onclick="needToPurchase()" class="dropdown-item" href="#"> <i class="fa fa-star text-warning" aria-hidden="true"></i> Add Custom Music</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+  <hr>
+  {% include 'includes/todo.html' %}
+</div>
+<style>
+  .clock .timer-circle {
+    font-size: 10rem;
+    font-weight: 200;
+  }
+
+  @media (max-width: 768px) {
+    .clock .timer-circle {
+      font-size: 5rem;
+      text-align: center;
+    }
+  }
+
+  .clock .next-break {
+    font-size: 1.5rem;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .clock .control-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .clock .control-buttons button {
+    margin: 0 10px;
+  }
+
+  .clock .control-buttons input[type="number"] {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+  }
+</style>
+
+<script>
+    function needToPurchase(){
+        Swal.fire({
+          title: "Premium Content",
+          text: "Only Premium User Can See This",
+          icon: "info",
+          showCancelButton: true, 
+        })
+    }
+
+
+  const handleClose = () => {
+    Swal.fire({
+      title: "Do You Want To Stop Studying?",
+      text: "Time will be added to your report",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Stop it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        sendStudyTimeToBackend(liveHours, liveMin, liveSec);
+      }
+    });
+  };
+
+  let breakTime = 1;
+  let studyTime = 0;
+  let endDate = new Date();
+  let liveHours = 0;
+  let liveMin = 0;
+  let liveSec = 0;
+
+  function startTimer() {
+    audio = new Audio("{% static 'music/ding.mp3' %}");
+    audio.play();
+    setInterval(() => {
+      updateTimer();
+    }, 1000);
+  }
+
+  function updateTimer() {
+    const now = new Date().getTime();
+    const distance = endDate.getTime() - now;
+    
+    if (distance <= 0) {
+      studyTime++;
+      if (studyTime >= breakTime) {
+        studyTime = 0;
+        audio = new Audio("{% static 'music/ding.mp3' %}");
+        audio.play();
+        Swal.fire({
+          title: "Congratulations!",
+          text: "You have studied for {{hours}} hours and {{minutes}} minutes",
+          icon: "success",
+          confirmButtonText: "OK",
+        })
+        setTimeout(() => {
+          window.location.href = "{% url 'report' %}";
+        }, 500);
+        return
+      }
+      endDate = new Date(now + breakTime * 60000);
+    }
+
+    liveHours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    liveMin = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    liveSec = Math.floor((distance % (1000 * 60)) / 1000);
+
+    formattedTime = `${String(liveHours).padStart(2, "0")}:${String(liveMin).padStart(2, "0")}:${String(
+      liveSec
+    ).padStart(2, "0")}`;
+    document.getElementsByTagName("title")[0].textContent =formattedTime + " Left"
+    document.getElementById("timer").textContent = formattedTime;
+  }
+
+  function resetTimer() {
+    const hoursFromBackend = parseInt("{{hours}}") || 0;
+    const minutesFromBackend = parseInt("{{minutes}}") || 0;
+    const secondsFromBackend = parseInt("{{seconds}}") || 0;
+
+    endDate = new Date();
+    endDate.setHours(
+      endDate.getHours() + hoursFromBackend,
+      endDate.getMinutes() + minutesFromBackend,
+      endDate.getSeconds() + secondsFromBackend
+    );
+        audio = new Audio("{% static 'music/ding.mp3' %}");
+    audio.play();
+  }
+
+  function sendStudyTimeToBackend(hours, minutes, seconds) {
+    const data = {
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+    };
+
+    // Sending AJAX request
+    fetch(window.location.href, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Study time sent successfully!");
+          window.location.href = "{% url 'index' %}";
+        } else {
+          console.error("Failed to send study time.");
+          window.location.href = "{% url 'index' %}";
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending study time:", error);
+      });
+  }
+
+  // On page load, start the timer
+  window.onload = function () {
+    resetTimer();
+    startTimer();
+  };
+</script>

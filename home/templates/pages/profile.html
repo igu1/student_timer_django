@@ -1,0 +1,49 @@
+{% extends 'layouts/base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid mt-5 d-flex justify-content-center align-items-center" style="width: fit-content">
+  <div class="container card">
+    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+      {% if user.profile.profile_pic %}
+      <img src="{{ user.profile.profile_pic.url }}" alt="" style="width: 100px; border-radius: 10px" />
+      {% else %}
+      <img
+        src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?t=st=1709331110~exp=1709331710~hmac=09282bbea2439dc705785f815a9d22624d2fb8a9908e6f6f4f916e88c0e6f344"
+        alt="img"
+        style="width: 100px; border-radius: 10px"
+      />
+      {% endif %}
+
+      <hr />
+      <h4 class="text-primary">{{ user.profile.first_name }} (@{{user.username}})</h4>
+      <p>{{ user.email }}</p>
+      <div class="d-flex align-items-end">
+        <h1 class="mx-1 text-info">{{ user.profile.score }}</h1>
+        <p>Hours</p>
+      </div>
+      <div class="badge">
+        {% if user.profile.score < 30 %}
+        <img src="{% static '3.png' %}" alt="bronze" />
+        <p class="text-center text-dark text-bold">Bronze</p>
+        {% elif user.profile.score < 100 %}
+        <img src="{% static '2.png' %}" alt="silver" />
+        <p class="text-center text-dark text-bold">Silver</p>
+
+        {% elif user.profile.score >= 200 %}
+        <img src="{% static '1.png' %}" alt="gold" />
+        <p class="text-center text-warning text-bold">Gold</p>
+
+        {% else %}
+        <img src="{% static '3.png' %}" alt="bronze" />
+        <p class="text-center text-dark">Bronze</p>
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .badge img {
+    width: 200px;
+  }
+</style>
+{% endblock content %}

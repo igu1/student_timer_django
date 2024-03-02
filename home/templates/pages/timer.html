@@ -1,0 +1,90 @@
+{% extends 'layouts/base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid py-4" id="container">
+  <div class="row">
+    <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+      <div class="d-flex justify-content-center align-items-center" style="height: 80vh">
+        {% include 'includes/timer.html' %}
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .flower {
+    position: absolute;
+    z-index: -99;
+  }
+</style>
+<script src="{% static 'js/countdown.js' %}"></script>
+<script>
+  function createFlower() {
+    console.log("createFlower");
+    for (let i = 0; i < 1; i++) {
+      const flower = document.createElement("div");
+      flower.classList.add("flower");
+
+      // Generate random position
+      const randomX = Math.random() * window.innerWidth;
+      const padding = 200;
+      const randomY = padding + Math.random() * (window.innerHeight - padding);
+
+      flower.style.left = randomX + "px";
+      flower.style.top = randomY + "px";
+
+      // Generate random size
+      const randomSize = Math.floor(Math.random() * 20) + 10;
+      flower.style.width = randomSize + "px";
+      flower.style.height = randomSize + "px";
+
+      // Random image
+      const randomImage =
+        Math.random() < 0.33
+          ? "{% static 'flower1.png' %}"
+          : Math.random() < 0.66
+          ? "{% static 'flower2.png' %}"
+          : "{% static 'flower3.png' %}";
+
+      flower.style.backgroundImage = `url('${randomImage}')`;
+      flower.style.backgroundSize = "cover";
+
+      document.getElementById("container").appendChild(flower);
+    }
+  }
+
+  let audio = null;
+
+  function stopMusic() {
+    if (audio) {
+      audio.pause();
+      document.getElementById("song").innerHTML = "Song Paused";
+    }
+  }
+
+  function playMusic(musicFile) {
+    stopMusic();
+    audio = new Audio("{% static 'music/' %}" + musicFile);
+    audio.play();
+    document.getElementById("musicDropdown").innerHTML = musicFile.split(".")[0];
+    document.getElementById("song").innerHTML = "Now Playing : " + musicFile.split(".")[0];
+  }
+
+  function purchase() {
+    let timerInterval;
+    Swal.fire({
+      title: "Purchasing!",
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      willClose: () => {
+        Swal.fire({
+          title: "Purchased!",
+          icon: "success",
+          showConfirmButton: true,
+        });
+      },
+    });
+  }
+</script>
+{% endblock content %}

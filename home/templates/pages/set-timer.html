@@ -1,0 +1,129 @@
+{% extends 'layouts/base.html' %} {% load static %} {% block content %}
+
+<div class="clock main">
+  <div class="timer-circle" id="timerDisplay">00:00:00</div>
+  <div class="button-group">
+    <button class="btn mr-2" onclick="addTime(600)">Add 10 Minutes</button>
+    <button class="btn mr-2" onclick="addTime(3600)">Add 1 Hour</button>
+    <button class="btn" onclick="resetTimer()">Reset</button>
+    <a href="{% url 'ask' %}" class="btn bg-success text-white" style="margin-bottom: 0px">Ask Me</a>
+  </div>
+  <a
+    href="{% url 'report' %}"
+    style="font-size: 2.5rem; margin-top: 10%"
+    data-toggle="tooltip"
+    data-placement="top"
+    title="Show The Reports"
+  >
+    <i class="fa fa-angle-down"></i>
+  </a>
+</div>
+
+<style>
+  .clock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+  }
+  .clock .timer-circle {
+    font-size: 10rem;
+    font-weight: 200;
+  }
+
+  @media (max-width: 768px) {
+    .clock .timer-circle {
+      font-size: 5rem;
+      text-align: center;
+    }
+  }
+
+  .clock .button-group {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .clock .button-group button {
+    margin: 0 10px;
+  }
+</style>
+
+<div class="fixed-plugin">
+  <button
+    style="border: none; display: flex; justify-content: center; padding: 30px 40px"
+    onClick="sendTimeToBackend()"
+    class="fixed-plugin-button text-white bg-success position-fixed"
+  >
+    <i class="fa fa-play py-2"> </i>
+  </button>
+  <div class="card shadow-lg"></div>
+</div>
+
+<script>
+  let addedTimeInSeconds = 0;
+
+  function updateTimerDisplay() {
+    const hours = Math.floor(addedTimeInSeconds / 3600);
+    const minutes = Math.floor((addedTimeInSeconds % 3600) / 60);
+    const seconds = addedTimeInSeconds % 60;
+
+    const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(
+      seconds
+    ).padStart(2, "0")}`;
+    document.getElementById("timerDisplay").textContent = formattedTime;
+  }
+
+  function addTime(seconds) {
+    addedTimeInSeconds += seconds;
+    updateTimerDisplay();
+  }
+
+  function resetTimer() {
+    addedTimeInSeconds = 0;
+    updateTimerDisplay();
+  }
+
+  function sendTimeToBackend() {
+    const hours = Math.floor(addedTimeInSeconds / 3600);
+    const minutes = Math.floor((addedTimeInSeconds % 3600) / 60);
+    const seconds = addedTimeInSeconds % 60;
+
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      alert("Please add at least 1 minute.");
+      return;
+    }
+
+    const timeData = {
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+    };
+    console.log(timeData);
+    fetch(window.location.href, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify(timeData),
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.ok) {
+          // Redirect to another page with parameters
+          const redirectUrl = `/timer?hs=${hours}&ms=${minutes}&ss=${seconds}`;
+          window.location.href = redirectUrl;
+        } else {
+          console.error("Failed to send time data to backend.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending time data to backend:", error);
+      });
+  }
+</script>
+
+{% if username %} {% include 'pages/overlay.html' %} {% endif %} {% endblock content %}

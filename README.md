@@ -1,4 +1,4 @@
-# ⏰ Student Timer (Django)  
+# ⏰ Student Timer (Django) 1 year hackathon
 *A hackathon project that actually worked*  
 
 ## What is this?  
